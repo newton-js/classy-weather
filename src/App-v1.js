@@ -59,14 +59,18 @@ async function getWeather(location) {
 }
 
 class App extends React.Component {
-  state = {
-    location: "lisbon",
-    isLoading: false,
-    displayLocation: "",
-    weather: {},
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      location: "lisbon",
+      isLoading: false,
+      displayLocation: "",
+      weather: {},
+    };
+    this.fetchWeather = this.fetchWeather.bind(this);
+  }
 
-  fetchWeather = async () => {
+  async fetchWeather() {
     try {
       this.setState({ isLoading: true });
       // 1) Getting location (geocoding)
@@ -91,22 +95,23 @@ class App extends React.Component {
       const weatherData = await weatherRes.json();
       this.setState({ weather: weatherData.daily });
     } catch (err) {
-      console.error(err);
+      console.err(err);
     } finally {
       this.setState({ isLoading: false });
     }
-  };
-
-  setLocation = (e) => this.setState({ location: e.target.value });
-
+  }
   render() {
     return (
       <div className="app">
         <h1>Classy Weather</h1>
-        <Input
-          location={this.state.location}
-          onChangeLocation={this.setLocation}
-        />
+        <div>
+          <input
+            type="text"
+            placeholder="Search from location"
+            value={this.state.location}
+            onChange={(e) => this.setState({ location: e.target.value })}
+          />
+        </div>
         <button onClick={this.fetchWeather}>Get Weather</button>
         {this.state.isLoading && <p className="loader">loading ...</p>}
         {this.state.weather.weathercode && (
@@ -121,21 +126,6 @@ class App extends React.Component {
 }
 
 export default App;
-
-class Input extends React.Component {
-  render() {
-    return (
-      <div>
-        <input
-          type="text"
-          placeholder="Search from location"
-          value={this.props.location}
-          onChange={this.props.onChangeLocation}
-        />
-      </div>
-    );
-  }
-}
 
 class Weather extends React.Component {
   render() {
